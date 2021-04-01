@@ -10,6 +10,7 @@ import com.dkit.oopca5.core.CAOService;
 import com.dkit.oopca5.core.DTO.Student;
 import com.dkit.oopca5.server.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CAOClient
@@ -47,23 +48,8 @@ public class CAOClient
                     break;
                 case LOGIN:
                     System.out.println("Enter Login details");
-                    System.out.println("Please enter your caoNumber: ");
-                    int caoNumber = keyboard.nextInt();
-                    keyboard.nextLine();
-                    System.out.println("Please enter your date of birth (yyyy-mm-dd): ");
-                    String dateString = keyboard.nextLine();
-                    System.out.println("Please enter your password: ");
-                    String password = keyboard.nextLine();
-                    StudentDaoInterface studentdao = new MySqlStudentDao();
-                    Student s = new Student(caoNumber,dateString,password);
-                    try {
-                        if(studentdao.login(s)){
-                            loggedInMenu(s);
-                        }
-                        break;
-                    } catch (DaoException throwables) {
-                        throwables.printStackTrace();
-                    }
+                    login();
+                    break;
             }
             printStartMenu();
             menuOption = getMenuOption();
@@ -77,18 +63,22 @@ public class CAOClient
         while(menuOption != QUIT){
             switch(menuOption){
                 case LOGOUT:
-                    System.out.println("Enter register details");
-                    register();
+                    System.out.println("Logging out");
+                    logout();
                     break;
                 case DISPLAY_COURSE:
                     System.out.println("Enter Course ID");
                     String courseid = keyboard.nextLine();
+                    displayCourse(courseid);
                     break;
                 case DISPLAY_ALL_COURSES:
+                    displayAllCourses();
                     break;
                 case DISPLAY_CURRENT_CHOICES:
+                    displayCurrentChoices(s.getCaoNumber());
                     break;
                 case UPDATE_CURRENT_CHOICES:
+                    updateChoices(s.getCaoNumber());
                     break;
             }
             printMainMenu();
@@ -154,7 +144,61 @@ public class CAOClient
                 dateString + CAOService.BREAKING_CHARACTER +
                 password;
         System.out.println("Message ready to send to server: " + message);
-//        StudentDaoInterface studentdao = new MySqlStudentDao();
-//        if(studentdao.registerStudent())
+    }
+
+    private void login(){
+        System.out.println("Please enter your caoNumber: ");
+        int caoNumber = keyboard.nextInt();
+        keyboard.nextLine();
+        System.out.println("Please enter your date of birth (yyyy-mm-dd): ");
+        String dateString = keyboard.nextLine();
+        System.out.println("Please enter your password: ");
+        String password = keyboard.nextLine();
+
+        String message = CAOService.LOGIN + CAOService.BREAKING_CHARACTER +
+                caoNumber + CAOService.BREAKING_CHARACTER +
+                dateString + CAOService.BREAKING_CHARACTER +
+                password;
+        System.out.println("Message ready to send to server: " + message);
+        Student s = new Student(caoNumber,dateString,password);
+        loggedInMenu(s);
+    }
+
+    private void logout(){
+        String message = CAOService.LOGOUT;
+        System.out.println("Message ready to send to server: " + message);
+    }
+
+    private void displayCourse(String courseId){
+        String message = CAOService.DISPLAY_COURSE + CAOService.BREAKING_CHARACTER + courseId;
+        System.out.println("Message ready to send to server: " + message);
+    }
+
+    private void displayAllCourses(){
+        String message = CAOService.DISPLAY_ALL;
+        System.out.println("Message ready to send to server: " + message);
+    }
+
+    private void displayCurrentChoices(int caoNumber){
+        String message = CAOService.DISPLAY_CURRENT + CAOService.BREAKING_CHARACTER + caoNumber;
+        System.out.println("Message ready to send to server: " + message);
+    }
+
+    private void updateChoices(int caoNumber){
+        ArrayList<String> update = new ArrayList<>();
+        String courseID = null;
+        boolean running = true;
+        while(running){
+            System.out.println("Please enter the courseID to add to your choices or 'done' to finish: ");
+            courseID = keyboard.nextLine();
+            if(courseID.matches("") || courseID.matches("done")){
+                running = false;
+            } else {
+                update.add(courseID);
+            }
+        }
+
+        String message = CAOService.UPDATE_CURRENT + CAOService.BREAKING_CHARACTER + caoNumber;
+        System.out.println("Message ready to send to server: " + message);
     }
 }
