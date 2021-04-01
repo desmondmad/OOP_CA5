@@ -68,6 +68,7 @@ public class CAOClient
                     break;
                 case DISPLAY_COURSE:
                     System.out.println("Enter Course ID");
+                    keyboard.nextLine();
                     String courseid = keyboard.nextLine();
                     displayCourse(courseid);
                     break;
@@ -122,8 +123,7 @@ public class CAOClient
         int option;
         System.out.println("Please enter option: ");
         option = keyboard.nextInt();
-        while(option != 0 && option != 1 && option != 2 && option != 3 && option != 4 && option != 5)
-        {
+        while(option != 0 && option != 1 && option != 2 && option != 3 && option != 4 && option != 5) {
             System.out.println("Please enter a valid number: ");
             option = keyboard.nextInt();
         }
@@ -133,11 +133,23 @@ public class CAOClient
     private void register(){
         System.out.println("Please enter caoNumber: ");
         int caoNumber = keyboard.nextInt();
+        while(!RegexChecker.validateCNumber(caoNumber)){
+            System.out.println("Please enter a valid caoNumber: ");
+            caoNumber = keyboard.nextInt();
+        }
         keyboard.nextLine();
         System.out.println("Please enter date of birth (yyyy-mm-dd): ");
         String dateString = keyboard.nextLine();
+        while(!RegexChecker.validateDOB(dateString)){
+            System.out.println("Please enter a valid date of birth (yyyy-mm-dd): ");
+            dateString = keyboard.nextLine();
+        }
         System.out.println("Please enter a password: ");
         String password = keyboard.nextLine();
+        while(!RegexChecker.validatePassword(password)){
+            System.out.println("Please enter a valid password: ");
+            password = keyboard.nextLine();
+        }
 
         String message = CAOService.REGISTER_COMMAND + CAOService.BREAKING_CHARACTER +
                 caoNumber + CAOService.BREAKING_CHARACTER +
@@ -167,6 +179,7 @@ public class CAOClient
     private void logout(){
         String message = CAOService.LOGOUT;
         System.out.println("Message ready to send to server: " + message);
+
     }
 
     private void displayCourse(String courseId){
@@ -190,6 +203,7 @@ public class CAOClient
         boolean running = true;
         while(running){
             System.out.println("Please enter the courseID to add to your choices or 'done' to finish: ");
+            keyboard.nextLine();
             courseID = keyboard.nextLine();
             if(courseID.matches("") || courseID.matches("done")){
                 running = false;
