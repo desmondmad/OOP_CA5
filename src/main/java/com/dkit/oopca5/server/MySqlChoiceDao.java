@@ -66,27 +66,27 @@ public class MySqlChoiceDao extends MySqlDao implements ChoiceDaoInterface{
         PreparedStatement ps = null;
         ResultSet rs = null;
         courses = new ArrayList<>();
-        int choicenum = 0;
+        int choicenum = 1;
+        int count = 0;
 
         try
         {
             //Get connection object using the methods in the super class (MySqlDao.java)...
             con = this.getConnection();
 
-            String query = "DELETE * FROM student_courses WHERE caoNumber = ?";
-            ps = con.prepareStatement(query);
+            String delQuery = "DELETE FROM student_courses WHERE caoNumber = ?";
+            ps = con.prepareStatement(delQuery);
             ps.setInt(1, caoNumber);
-
             //Using a PreparedStatement to execute SQL...
-            rs = ps.executeQuery();
+            count = ps.executeUpdate();
 
             for(int i = 0; i < courses.size();i++){
-                query = "INSERT INTO student_courses VALUES (?,?,?)";
-                ps = con.prepareStatement(query);
+                String insQuery = "INSERT INTO student_courses(`caoNumber`,`courseid`,`placement`) VALUES (?,?,?)";
+                ps = con.prepareStatement(insQuery);
                 ps.setInt(1,caoNumber);
                 ps.setString(2, courses.get(i));
                 ps.setInt(3, choicenum++);
-                rs = ps.executeQuery();
+                count = ps.executeUpdate();
             }
 
         } catch (SQLException e)
